@@ -1,0 +1,79 @@
+Format of the .ttr file
+Use a regular Scanner to read from it
+The first number represents the number of cities N
+The next N lines each represent the data for a city. 
+For each city: 
+	First number is the CITY_ID
+	Second input is a city name (Doesn't contain spaces)
+	 - Note, when writing to the .ttr file, I used <City Name>.replaceAll(" ", "_");
+		to replace the spaces in the city name to an underscore, 
+		When reading from this file, replace the underscores with a space: 
+			- <City Name>.replaceAll("_", " ");
+	Next 2 integer inputs represent the X & Y coordinate of the center of the city on the board
+The next line should only contain one number K that represents the number of rails created
+The next few lines contain the data for each of the K rails
+For each Rail: 
+	-RAIL_ID
+	-CITY_ID of City A
+	-CITY_ID of City B
+	-Number of trains needed to build track
+	-Boolean value representing whether the track has 2 rails or not
+		-Note, this value is very important for the following lines
+	-Curvature of the track 
+		-If you don't understand what this number is for then it's fine
+			I mainly used it for the application :D and it is not necessary 
+			for making your game
+	-The next few lines depend on whether the track has 2 rails or not 
+		(The only boolean value in the input)
+		If it has 2 rails, there are 2 lines following, else 1 line
+		-Each line represents a single track on this rail...
+		-For each:
+			-Track Color
+			-Track X1 Pos (Should be the same as City A X Pos)
+			-Track Y1 Pos (Should be the same as City A Y Pos)
+			-Track X2 Pos (Will explain later, used for the curve)
+			-Track Y2 Pos (Will explain later, used for the curve)
+			-Track X3 Pos (Should be the same as City B X Pos)
+			-Track Y3 Pos (Should be the same as City B Y Pos)
+
+How to draw the curve with the 3 provided points for the rails:
+	-Learn how to use a java class called Path2D
+	-It'll automatically draw out the curve for you
+	-The 2nd point provided for a track (X2, Y2) represents the 
+		vertex of a parabola that passes through the 2 cities (Points (X1, Y1) & (X2, Y2) and it 
+		is used to create the curve with the Path2D object
+	
+	-Code example to get the curved path into a Path2d object: {
+		Path2D path = new Path2D.Double();
+		path.moveTo(X1, Y1); // Should always start a path2d with moveTo();
+		path.quadTo(X2, Y2, X3, Y3); 
+		// This will create a curve starting from the current point in the path
+		// passing through the 2 points provided :D
+	}
+	
+	-Code example of displaying path with Graphics2D object: {
+		// Pretend this method was in your Rail class
+		public void drawRail(Graphics gr) {
+			Graphics2D g = (Graphics2D) gr.create(); // Graphics2D is more advanced than Graphics
+			g.setColor(Color.red); // whatever color...
+			g.fill(path); // Assuming path was a class variable
+		}
+	}
+	
+	-You probably noticed how the tracks in the application 
+		actually have gaps in between each train spot
+		I used a Graphics2D setting that changes the Stroke of the object
+		The default stroke is a basic line but you can configure 
+		it to be a dashed line
+		Read up on how to create a dashed line for a Graphics2D object
+		
+		Code Example: {
+			Graphics2D g = ???;
+			g.setStroke(new BasicStroke(10, BasicStroke.CAP_BUTT, 
+				BasicStroke.JOIN_BEVEL, 0f, 
+				new float[]{33, 3}, // These are the values you change to manipulate the dashes
+				22));
+			g.fill(path);
+		}
+		-For the dashes, I found that a 33 pixel length dash followed by a 3 pixel length gap 
+			was close to the desired dashes for the train spots
